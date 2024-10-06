@@ -1,18 +1,7 @@
-data "aws_availability_zones" "available" {}
+data "aws_eks_cluster" "existing_cluster" {
+  name = "test-eks-cluster"
 
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = "3.14.2"
-
-  name = "eks-vpc"
-  cidr = "10.0.0.0/16"
-
-  azs             = slice(data.aws_availability_zones.available.names, 0, 2)
-  public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnets = ["10.0.3.0/24", "10.0.4.0/24"]
-
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  count = length(try(data.aws_eks_cluster.existing_cluster[*].id, []))
 }
 
 module "eks" {
@@ -22,8 +11,10 @@ module "eks" {
   cluster_name    = "test-eks-cluster"
   cluster_version = "1.24"
 
-  subnets         = module.vpc.private_subnets
-  vpc_id          = module.vpc.vpc_id
+  subnets         = var.private_subnets
+  vpc_id          = var.existing_vpc_id
+
+  create_eks      = length(data.aws_eks_cluster.existing_cluster) == 0
 
   node_groups = {
     eks_nodes = {
@@ -35,3 +26,4 @@ module "eks" {
     }
   }
 }
+
