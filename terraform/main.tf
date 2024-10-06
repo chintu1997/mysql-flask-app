@@ -1,7 +1,5 @@
 data "aws_eks_cluster" "existing_cluster" {
   name = "test-eks-cluster"
-
-  count = length(try(data.aws_eks_cluster.existing_cluster[*].id, []))
 }
 
 module "eks" {
@@ -14,7 +12,7 @@ module "eks" {
   subnets         = var.private_subnets
   vpc_id          = var.existing_vpc_id
 
-  create_eks      = length(data.aws_eks_cluster.existing_cluster) == 0
+  create_eks      = try(data.aws_eks_cluster.existing_cluster.id, "") == ""
 
   node_groups = {
     eks_nodes = {
@@ -26,4 +24,3 @@ module "eks" {
     }
   }
 }
-
