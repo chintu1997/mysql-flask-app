@@ -1,9 +1,3 @@
-# main.tf
-provider "aws" {
-  region = "eu-west-2"
-  version = "~> 3.0"
-}
-
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.14.2"
@@ -37,9 +31,4 @@ module "eks" {
       instance_type = "t2.micro"
     }
   }
-}
-
-output "kubeconfig" {
-  value = module.eks.kubeconfig
-  sensitive = true
 }
