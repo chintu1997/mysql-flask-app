@@ -5,20 +5,15 @@ module "eks" {
   cluster_name    = "test-eks-cluster"
   cluster_version = "1.24"
 
-  subnets         = var.private_subnets
-  vpc_id          = var.existing_vpc_id
-
-  lifecycle {
-    prevent_destroy = true
-  }
+  vpc_id  = var.existing_vpc_id
+  subnets = var.private_subnets
 
   node_groups = {
     eks_nodes = {
       desired_capacity = 2
       max_capacity     = 3
       min_capacity     = 1
-
-      instance_type = "t2.micro"
+      instance_type    = "t2.micro"
     }
   }
 }
