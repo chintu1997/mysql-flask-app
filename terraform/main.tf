@@ -12,6 +12,7 @@ module "vpc" {
   private_subnets = ["10.0.3.0/24", "10.0.4.0/24"]
 
   enable_nat_gateway = true
+  single_nat_gateway = true
 }
 
 module "eks" {
@@ -19,7 +20,7 @@ module "eks" {
   version         = "17.1.0"
 
   cluster_name    = "test-eks-cluster"
-  cluster_version = "1.21"
+  cluster_version = "1.24"
 
   subnets         = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
