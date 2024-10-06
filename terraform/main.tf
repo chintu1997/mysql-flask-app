@@ -1,7 +1,3 @@
-data "aws_eks_cluster" "existing_cluster" {
-  name = "test-eks-cluster"
-}
-
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "17.1.0"
@@ -12,7 +8,9 @@ module "eks" {
   subnets         = var.private_subnets
   vpc_id          = var.existing_vpc_id
 
-  create_eks      = try(data.aws_eks_cluster.existing_cluster.id, "") == ""
+  lifecycle {
+    prevent_destroy = true
+  }
 
   node_groups = {
     eks_nodes = {
