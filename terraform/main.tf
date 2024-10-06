@@ -26,7 +26,6 @@ module "eks" {
   }
 }
 
-# Create the aws-auth ConfigMap to grant access to the EKS cluster
 resource "kubernetes_config_map" "aws_auth" {
   depends_on = [module.eks]
 
@@ -38,7 +37,7 @@ resource "kubernetes_config_map" "aws_auth" {
   data = {
     mapRoles = yamlencode([
       {
-        rolearn  = module.eks.node_groups["eks_nodes"].iam_role_arn  # Use the role ARN from the module's outputs
+        rolearn  = module.eks.node_groups["eks_nodes"].iam_role_arn
         username = "system:node:{{EC2PrivateDNSName}}"
         groups   = ["system:bootstrappers", "system:nodes"]
       }
