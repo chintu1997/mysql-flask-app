@@ -2,7 +2,7 @@ data "aws_eks_cluster" "eks_cluster" {
   name = module.eks.cluster_id
 }
 
-data "aws_eks_cluster_auth" "eks_cluster_auth" {
+data "aws_eks_cluster_auth" "aws_eks_auth" {
   name = module.eks.cluster_id
 }
 
@@ -37,7 +37,7 @@ resource "kubernetes_config_map" "aws_auth" {
   data = {
     mapRoles = yamlencode([
       {
-        rolearn  = module.eks.node_groups["eks_nodes"].iam_role_arn
+        rolearn  = module.eks.node_groups_role_arn["eks_nodes"]
         username = "system:node:{{EC2PrivateDNSName}}"
         groups   = ["system:bootstrappers", "system:nodes"]
       }
