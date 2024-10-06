@@ -6,10 +6,6 @@ data "aws_eks_cluster_auth" "eks_cluster_auth" {
   name = module.eks.cluster_id
 }
 
-data "aws_iam_role" "node_group_role" {
-  name = module.eks.node_groups["eks_nodes"].iam_role_name
-}
-
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "17.1.0"
@@ -30,6 +26,7 @@ module "eks" {
   }
 }
 
+# Create the aws-auth ConfigMap to grant access to the EKS cluster
 resource "kubernetes_config_map" "aws_auth" {
   depends_on = [module.eks]
 
@@ -41,7 +38,7 @@ resource "kubernetes_config_map" "aws_auth" {
   data = {
     mapRoles = yamlencode([
       {
-        rolearn  = data.aws_iam_role.node_group_role.arn
+        rolearn  = module.eks.node_groups["eks_nodes"].iam_role_arn  # Use the role ARN from the module's outputs
         username = "system:node:{{EC2PrivateDNSName}}"
         groups   = ["system:bootstrappers", "system:nodes"]
       }
