@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: python-flask-app
+  repository: rohithbathini97/python-flask-app
   tag: latest
   pullPolicy: IfNotPresent 
 
