@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "python-mysql-app.fullname" . }}
+  labels:
+    app: {{ include "python-mysql-app.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: {{ include "python-mysql-app.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "python-mysql-app.name" . }}
+    spec:
+      containers:
+        - name: python-flask-app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: MYSQL_HOST
+              value: "{{ .Values.env.mysqlHost }}"
+            - name: MYSQL_USER
+              value: "{{ .Values.env.mysqlUser }}"
+            - name: MYSQL_PASSWORD
+              value: "{{ .Values.env.mysqlPassword }}"
+            - name: MYSQL_DATABASE
+              value: "{{ .Values.env.mysqlDatabase }}"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
